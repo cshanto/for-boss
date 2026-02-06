@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Ultimate Angry Cat</title>
+    <style>
+        :root {
+            --bg-color: #ef235a;
+            --card-bg: rgba(255, 255, 255, 0.15);
+            --text-color: #ffffff;
+            --btn-yes: #ffffff;
+            --btn-no: #333333;
+            --mood: 0;
+            --cat-face: hsl(calc(30 - (var(--mood) * 40)), 100%, calc(75% - (var(--mood) * 35%)));
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .ambient {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            filter: blur(50px);
+            z-index: 0;
+            animation: float-bg 20s infinite alternate;
+        }
+
+        @keyframes float-bg {
+            0% {
+                transform: translate(0, 0);
+            }
+
+            100% {
+                transform: translate(100px, 100px);
+            }
+        }
+
+        .container {
+            z-index: 10;
+            text-align: center;
+            padding: 3rem;
+            padding-top: 5.5rem;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 32px;
+            box-shadow: 0 40px 60px -20px rgba(0, 0, 0, 0.4);
+            width: 380px;
+            min-height: 250px;
+            position: relative;
+            margin-top: 150px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .cat-avatar {
+            position: absolute;
+            top: -150px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 450px;
+            /* Extra wide to avoid clipping ears */
+            height: 350px;
+            z-index: 5;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            pointer-events: none;
+        }
+
+        .cat-body {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            animation: shake-intense infinite;
+            /* Constant wobble: slows (0.8s) when calm, fast (0.1s) when angry */
+            animation-duration: calc(0.8s - (var(--mood) * 0.7s));
+            animation-play-state: running;
+        }
+
+        @keyframes shake-intense {
+            0% {
+                transform: translate(3px, 3px) rotate(0deg);
+            }
+
+            25% {
+                transform: translate(-3px, -3px) rotate(1deg);
+            }
+
+            50% {
+                transform: translate(3px, -3px) rotate(-1deg);
+            }
+
+            75% {
+                transform: translate(-3px, 3px) rotate(0deg);
+            }
+
+            100% {
+                transform: translate(3px, 3px) rotate(1deg);
+            }
+        }
+
+        .ears {
+            position: absolute;
+            top: -10px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            z-index: 1;
+        }
+
+        .ear {
+            width: 150px;
+            height: 170px;
+            /* ULTIMATE MASSIVE EARS */
+            background: var(--cat-face);
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            transition: all 0.3s ease;
+        }
+
+        .ear.left {
+            transform: rotate(calc(-12deg - (var(--mood) * 60deg)));
+        }
+
+        .ear.right {
+            transform: rotate(calc(12deg + (var(--mood) * 60deg)));
+        }
+
+        .face {
+            position: relative;
+            width: 300px;
+            height: 230px;
+            background: var(--cat-face);
+            border-radius: 110px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 -10px 20px rgba(0, 0, 0, 0.1);
+            transition: background 0.3s ease;
+            z-index: 2;
+        }
+
+        .whiskers {
+            position: absolute;
+            top: 130px;
+            width: 100%;
+            pointer-events: none;
+        }
+
+        .whisker {
+            position: absolute;
+            width: 75px;
+            height: 3px;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 2px;
+            transition: background 0.3s ease;
+        }
+
+        .whisker.left-1 {
+            left: -30px;
+            top: 0;
+            transform: rotate(10deg);
+        }
+
+        .whisker.left-2 {
+            left: -35px;
+            top: 15px;
+            transform: rotate(0deg);
+        }
+
+        .whisker.left-3 {
+            left: -30px;
+            top: 30px;
+            transform: rotate(-10deg);
+        }
+
+        .whisker.right-1 {
+            right: -30px;
+            top: 0;
+            transform: rotate(-10deg);
+        }
+
+        .whisker.right-2 {
+            right: -35px;
+            top: 15px;
+            transform: rotate(0deg);
+        }
+
+        .whisker.right-3 {
+            right: -30px;
+            top: 30px;
+            transform: rotate(10deg);
+        }
+
+        .blush {
+            position: absolute;
+            width: 45px;
+            height: 28px;
+            background: rgba(255, 100, 150, 0.5);
+            border-radius: 50%;
+            top: 120px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .blush.left {
+            left: 40px;
+        }
+
+        .blush.right {
+            right: 40px;
+        }
+
+        .eyes {
+            width: 85%;
+            display: flex;
+            justify-content: space-around;
+            margin-top: -15px;
+        }
+
+        .eye-wrap {
+            position: relative;
+            width: 90px;
+            height: 90px;
+        }
+
+        .eyebrow {
+            position: absolute;
+            top: -15px;
+            width: 100%;
+            height: 10px;
+            background: #000;
+            border-radius: 5px;
+            transition: transform 0.3s ease;
+            z-index: 10;
+        }
+
+        .eye-wrap.left .eyebrow {
+            transform: rotate(calc(var(--mood) * 45deg));
+        }
+
+        .eye-wrap.right .eyebrow {
+            transform: rotate(calc(var(--mood) * -45deg));
+        }
+
+        .eye {
+            width: 80px;
+            height: 80px;
+            /* HUGE ADORABLE EYES */
+            background: #fff;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 5px solid #000;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .pupil {
+            width: 32px;
+            height: 100%;
+            background: #000;
+            border-radius: 50%;
+            transform: scaleX(calc(1 - (var(--mood) * 0.9)));
+            transition: transform 0.3s ease;
+        }
+
+        .mouth-wrap {
+            margin-top: 20px;
+            width: 85px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .mouth {
+            width: 80%;
+            height: calc(10px + (var(--mood) * 50px));
+            border-bottom: 6px solid #000;
+            border-radius: 0 0 50px 50px;
+            transition: all 0.3s ease;
+            transform: translateY(calc(var(--mood) * -20px));
+            background: calc(var(--mood) > 0.6 ? '#fff' : 'transparent');
+        }
+
+        .nose {
+            width: 24px;
+            height: 16px;
+            background: #ff99aa;
+            border-radius: 50%;
+            margin-top: 5px;
+        }
+
+        /* MOOD OVERRIDES */
+        .cat-avatar.happy {
+            --mood: -0.1 !important;
+        }
+
+        .cat-avatar.happy .face,
+        .cat-avatar.happy .ear {
+            background: #ffeb99 !important;
+        }
+
+        .cat-avatar.happy .blush {
+            opacity: 1;
+        }
+
+        .cat-avatar.happy .eye {
+            height: 35px !important;
+            border-radius: 50% 50% 0 0 !important;
+            border-bottom: none !important;
+            background: transparent !important;
+            border-top: 8px solid #000 !important;
+            border-left: 8px solid #000 !important;
+            border-right: 8px solid #000 !important;
+            transform: translateY(15px);
+        }
+
+        .cat-avatar.happy .pupil {
+            display: none;
+        }
+
+        .cat-avatar.happy .mouth {
+            height: 35px;
+            border-radius: 0 0 100px 100px;
+            background: transparent;
+        }
+
+        h1 {
+            color: var(--text-color);
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .btn {
+            padding: 14px 40px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .btn-yes {
+            background: #fff;
+            color: var(--bg-color);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-yes:hover {
+            transform: scale(1.15);
+        }
+
+        .btn-no {
+            background: #333;
+            color: #fff;
+            z-index: 2147483647;
+            /* MAX INTEGER Z-INDEX */
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5), 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        #popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000000;
+            backdrop-filter: blur(20px);
+        }
+
+        .popup-content {
+            background: #fff;
+            padding: 50px;
+            border-radius: 40px;
+            text-align: center;
+            max-width: 450px;
+            transform: scale(0.8);
+            opacity: 0;
+            transition: 0.5s;
+        }
+
+        .popup-content.active {
+            transform: scale(1);
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="ambient" style="width: 300px; height: 300px; top: -100px; left: -100px;"></div>
+    <div class="ambient" style="width: 400px; height: 400px; bottom: -150px; right: -150px; animation-delay: -5s;">
+    </div>
+
+    <div class="container">
+        <div class="cat-avatar" id="cat">
+            <div class="cat-body">
+                <div class="ears">
+                    <div class="ear left"></div>
+                    <div class="ear right"></div>
+                </div>
+                <div class="face">
+                    <div class="whiskers">
+                        <div class="whisker left-1"></div>
+                        <div class="whisker left-2"></div>
+                        <div class="whisker left-3"></div>
+                        <div class="whisker right-1"></div>
+                        <div class="whisker right-2"></div>
+                        <div class="whisker right-3"></div>
+                    </div>
+                    <div class="blush left"></div>
+                    <div class="blush right"></div>
+                    <div class="eyes">
+                        <div class="eye-wrap left">
+                            <div class="eyebrow"></div>
+                            <div class="eye">
+                                <div class="pupil"></div>
+                            </div>
+                        </div>
+                        <div class="eye-wrap right">
+                            <div class="eyebrow"></div>
+                            <div class="eye">
+                                <div class="pupil"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="nose"></div>
+                    <div class="mouth-wrap">
+                        <div class="mouth"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h1>{"AsdfggggA" ?}</h1>
+        <div class="buttons">
+            <button class="btn btn-yes" id="yesBtn">Yes</button>
+            <button class="btn btn-no" id="noBtn">No</button>
+        </div>
+    </div>
+
+    <div id="popup-overlay">
+        <div class="popup-content" id="popupContent">
+            <h1 style="color: #333; font-size: 6rem; margin: 0;">💝</h1>
+            <h2 style="color: #333; font-size: 2.5rem;">YAAAAAY!</h2>
+            <p style="color: #666; font-size: 1.2rem;">You made the kitty so happy!</p>
+            <button class="btn btn-yes" style="background: var(--bg-color); color: white; margin-top:20px;"
+                onclick="location.reload()">Try Again?</button>
+        </div>
+    </div>
+
+    <script>
+        const noBtn = document.getElementById('noBtn');
+        const yesBtn = document.getElementById('yesBtn');
+        const cat = document.getElementById('cat');
+        const container = document.querySelector('.container');
+        const overlay = document.getElementById('popup-overlay');
+        const content = document.getElementById('popupContent');
+
+        let anger = 0;
+        const MAX_ANGER = 20;
+
+        const updateMood = (isHappy = false) => {
+            if (isHappy) {
+                cat.classList.add('happy');
+                return;
+            }
+            cat.classList.remove('happy');
+            const intensity = anger / MAX_ANGER;
+            document.documentElement.style.setProperty('--mood', intensity);
+        };
+
+        const moveNo = () => {
+            if (anger < MAX_ANGER) anger++;
+            updateMood();
+
+            // Force escape to Body
+            if (noBtn.parentElement !== document.body) {
+                document.body.appendChild(noBtn);
+            }
+
+            // Extreme Reset
+            noBtn.style.position = 'fixed';
+            noBtn.style.margin = '0';
+            noBtn.style.transform = 'none';
+            noBtn.style.right = 'auto';
+            noBtn.style.bottom = 'auto';
+            noBtn.style.transition = 'none';
+            noBtn.style.zIndex = '2147483647';
+            noBtn.style.display = 'block';
+            noBtn.style.visibility = 'visible';
+            noBtn.style.opacity = '1';
+
+            const m = 40; // Safe margin from edges
+            const btnW = noBtn.offsetWidth || 100;
+            const btnH = noBtn.offsetHeight || 50;
+            const viewW = window.innerWidth;
+            const viewH = window.innerHeight;
+            const cRect = container.getBoundingClientRect();
+            const yRect = yesBtn.getBoundingClientRect();
+
+            let rx, ry;
+            let attempts = 0;
+
+            do {
+                const maxX = Math.max(m, viewW - btnW - m);
+                const maxY = Math.max(m, viewH - btnH - m);
+
+                rx = Math.floor(Math.random() * (maxX - m)) + m;
+                ry = Math.floor(Math.random() * (maxY - m)) + m;
+                attempts++;
+
+                // AVOID CARDArea (with buffer)
+                const inCard = (
+                    rx + btnW > cRect.left - 40 &&
+                    rx < cRect.right + 40 &&
+                    ry + btnH > cRect.top - 40 &&
+                    ry < cRect.bottom + 40
+                );
+
+                // AVOID Yes Button area strictly
+                const inYes = (
+                    rx + btnW > yRect.left - 20 &&
+                    rx < yRect.right + 20 &&
+                    ry + btnH > yRect.top - 20 &&
+                    ry < yRect.bottom + 20
+                );
+
+                if (!inCard && !inYes) break;
+            } while (attempts < 200);
+
+            // Fail-safe jump
+            if (attempts >= 200) { rx = m; ry = m; }
+
+            noBtn.style.left = rx + 'px';
+            noBtn.style.top = ry + 'px';
+        };
+
+        // Attach events
+        noBtn.addEventListener('mouseenter', moveNo);
+        noBtn.addEventListener('touchstart', (e) => { e.preventDefault(); moveNo(); }, { passive: false });
+        noBtn.addEventListener('click', (e) => { e.preventDefault(); moveNo(); });
+
+        yesBtn.addEventListener('mouseenter', () => updateMood(true));
+        yesBtn.addEventListener('mouseleave', () => updateMood(false));
+
+        yesBtn.addEventListener('click', () => {
+            overlay.style.display = 'flex';
+            setTimeout(() => content.classList.add('active'), 10);
+            for (let i = 0; i < 40; i++) {
+                const s = document.createElement('div');
+                s.style.position = 'fixed';
+                s.style.zIndex = '2147483647';
+                s.innerHTML = ['💖', '✨', '⭐', '🌸'][Math.floor(Math.random() * 4)];
+                s.style.left = Math.random() * 100 + 'vw';
+                s.style.top = Math.random() * 100 + 'vh';
+                s.style.fontSize = (Math.random() * 20 + 20) + 'px';
+                document.body.appendChild(s);
+                s.animate([
+                    { opacity: 1, transform: 'scale(0) translateY(0)' },
+                    { opacity: 0, transform: `scale(2) translateY(-${Math.random() * 200}px) rotate(${Math.random() * 360}deg)` }
+                ], 2000);
+                setTimeout(() => s.remove(), 2000);
+            }
+        });
+    </script>
+</body>
+
+</html>
